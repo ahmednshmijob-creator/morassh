@@ -42,20 +42,18 @@ export default function AdminLayout({
   return (
       <div dir={dir}>
         <SessionTimeout />
-        <SidebarProvider>
-          <Sidebar side={isRTL ? "right" : "left"}>
+        <SidebarProvider defaultOpen={true}>
+          <Sidebar side={isRTL ? "right" : "left"} collapsible="icon">
             <AdminSidebar />
           </Sidebar>
-          <div className="min-h-screen w-full bg-muted/40">
-            <SidebarInset>
-              <Header />
-              <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:grid-cols-1">
-                <AdminAccountStatusChecker>
-                  {children}
-                </AdminAccountStatusChecker>
-              </main>
-            </SidebarInset>
-          </div>
+          <SidebarInset className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1 p-4 sm:p-6">
+              <AdminAccountStatusChecker>
+                {children}
+              </AdminAccountStatusChecker>
+            </main>
+          </SidebarInset>
         </SidebarProvider>
       </div>
   );
