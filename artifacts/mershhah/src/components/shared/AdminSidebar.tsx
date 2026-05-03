@@ -68,11 +68,7 @@ export function AdminSidebar() {
 
     const channel = supabase
       .channel('admin-unread-chats')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'chats' },
-        () => { fetchUnread(); }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chats' }, () => { fetchUnread(); })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
@@ -90,22 +86,28 @@ export function AdminSidebar() {
   });
 
   return (
-    <aside className="flex h-full flex-col">
-      <SidebarHeader>
+    <div className="flex h-full flex-col bg-sidebar border-l">
+      <SidebarHeader className="px-4 py-4">
         <Logo />
       </SidebarHeader>
-      <SidebarContent className="flex-1">
+      <Separator />
+      <SidebarContent className="flex-1 px-2 py-3">
         <SidebarMenu>
           {visibleMenuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)}>
+              <SidebarMenuButton
+                asChild
+                size="lg"
+                isActive={pathname.startsWith(item.href)}
+                className="h-11 px-3 text-base"
+              >
                 <Link href={item.href} className="flex justify-between items-center w-full">
-                  <div className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4" />
-                    {item.label}
+                  <div className="flex items-center gap-3">
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    <span>{item.label}</span>
                   </div>
                   {item.href === '/admin/support' && unreadCount > 0 && (
-                    <Badge className="h-5 w-5 p-0 flex items-center justify-center bg-destructive text-destructive-foreground">
+                    <Badge className="h-5 min-w-5 px-1 flex items-center justify-center bg-destructive text-destructive-foreground text-xs">
                       {unreadCount}
                     </Badge>
                   )}
@@ -115,29 +117,32 @@ export function AdminSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter>
+      <Separator />
+      <SidebarFooter className="px-2 py-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
+            <SidebarMenuButton asChild size="lg" className="h-11 px-3 text-base" isActive={pathname === '/admin/settings'}>
               <Link href="/admin/settings">
-                <Settings className="h-4 w-4" />
-                الإعدادات
+                <Settings className="h-5 w-5 shrink-0" />
+                <span>الإعدادات</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              onClick={handleLogout}
+              className="h-11 px-3 text-base text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              <LogOut className="h-5 w-5 shrink-0" />
+              <span>تسجيل الخروج</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
-        <Separator className="my-2" />
-        <SidebarMenuButton
-          onClick={handleLogout}
-          className="text-destructive hover:text-destructive"
-        >
-          <LogOut className="h-4 w-4" />
-          تسجيل الخروج
-        </SidebarMenuButton>
-        <div className="px-2 py-1 mt-2">
+        <div className="px-3 pt-2">
           <LanguageSwitcherSimple />
         </div>
       </SidebarFooter>
-    </aside>
+    </div>
   );
 }
