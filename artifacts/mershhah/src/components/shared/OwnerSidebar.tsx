@@ -11,6 +11,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubItem,
   SidebarMenuSubButton,
+  SidebarMenuSkeleton,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -38,7 +39,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useUser } from '@/hooks/useUser';
-import { SidebarMenuSkeleton } from '../ui/sidebar';
 
 const iconMap: { [key: string]: React.ElementType } = { ...icons, Box };
 
@@ -69,34 +69,20 @@ export function OwnerSidebar() {
 
   useEffect(() => {
     const fetchTools = async () => {
-      if (!user?.id) {
-        setIsLoadingTools(false);
-        return;
-      }
+      if (!user?.id) { setIsLoadingTools(false); return; }
       setIsLoadingTools(true);
       try {
         const { data: allTools } = await supabase.from('tools').select('id, title, icon');
         const allToolsMap = new Map((allTools || []).map((t: any) => [t.id, t]));
-
         const { data: activatedToolsData } = await supabase
-          .from('activated_tools')
-          .select('tool_id')
-          .eq('profile_id', user.id);
-
+          .from('activated_tools').select('tool_id').eq('profile_id', user.id);
         const userTools = (activatedToolsData || [])
           .map((row: any) => {
             const toolDetails = allToolsMap.get(row.tool_id) as any;
             if (!toolDetails) return null;
             const IconComponent = iconMap[toolDetails.icon as string] || Box;
-            return {
-              id: row.tool_id,
-              label: toolDetails.title,
-              href: `/owner/tools/${row.tool_id}`,
-              icon: IconComponent,
-            };
-          })
-          .filter(Boolean);
-
+            return { id: row.tool_id, label: toolDetails.title, href: `/owner/tools/${row.tool_id}`, icon: IconComponent };
+          }).filter(Boolean);
         setActivatedTools(userTools as any[]);
       } catch (error) {
         console.error('Error fetching activated tools:', error);
@@ -104,7 +90,6 @@ export function OwnerSidebar() {
         setIsLoadingTools(false);
       }
     };
-
     fetchTools();
   }, [user]);
 
@@ -115,18 +100,23 @@ export function OwnerSidebar() {
   };
 
   return (
-    <>
-      <SidebarHeader>
+    <div className="flex h-full flex-col bg-sidebar border-l">
+      <SidebarHeader className="px-4 py-4">
         <Logo />
       </SidebarHeader>
       <Separator />
-      <SidebarContent>
+      <SidebarContent className="flex-1 px-2 py-3">
         <SidebarMenu>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)}>
+              <SidebarMenuButton
+                asChild
+                size="lg"
+                isActive={pathname.startsWith(item.href)}
+                className="h-11 px-3 text-base"
+              >
                 <Link href={item.href}>
-                  <item.icon />
+                  <item.icon className="h-5 w-5 shrink-0" />
                   <span>{item.label}</span>
                 </Link>
               </SidebarMenuButton>
@@ -134,17 +124,13 @@ export function OwnerSidebar() {
           ))}
 
           {(isLoadingTools || activatedTools.length > 0) && (
-            <Collapsible
-              open={isToolsOpen}
-              onOpenChange={setIsToolsOpen}
-              className="group/collapsible"
-            >
+            <Collapsible open={isToolsOpen} onOpenChange={setIsToolsOpen} className="group/collapsible">
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip="أدواتي المفعلة">
-                    <Box />
+                  <SidebarMenuButton size="lg" className="h-11 px-3 text-base">
+                    <Box className="h-5 w-5 shrink-0" />
                     <span>أدواتي المفعلة</span>
-                    <ChevronDown className="mr-auto" />
+                    <ChevronDown className="mr-auto h-4 w-4 transition-transform group-data-[state=open]/collapsible:rotate-180" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -157,9 +143,9 @@ export function OwnerSidebar() {
                     ) : (
                       activatedTools.map((tool) => (
                         <SidebarMenuSubItem key={tool.id}>
-                          <SidebarMenuSubButton asChild isActive={pathname === tool.href}>
+                          <SidebarMenuSubButton asChild isActive={pathname === tool.href} className="h-9 text-sm">
                             <Link href={tool.href}>
-                              <tool.icon className="h-4 w-4" />
+                              <tool.icon className="h-4 w-4 shrink-0" />
                               <span>{tool.label}</span>
                             </Link>
                           </SidebarMenuSubButton>
@@ -176,9 +162,14 @@ export function OwnerSidebar() {
 
           {supportItems.map((item) => (
             <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)}>
+              <SidebarMenuButton
+                asChild
+                size="lg"
+                isActive={pathname.startsWith(item.href)}
+                className="h-11 px-3 text-base"
+              >
                 <Link href={item.href}>
-                  <item.icon />
+                  <item.icon className="h-5 w-5 shrink-0" />
                   <span>{item.label}</span>
                 </Link>
               </SidebarMenuButton>
@@ -187,32 +178,36 @@ export function OwnerSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <Separator />
-      <SidebarFooter>
+      <SidebarFooter className="px-2 py-3">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === '/owner/settings'}>
+            <SidebarMenuButton
+              asChild
+              size="lg"
+              isActive={pathname === '/owner/settings'}
+              className="h-11 px-3 text-base"
+            >
               <Link href="/owner/settings">
-                <Settings />
+                <Settings className="h-5 w-5 shrink-0" />
                 <span>الإعدادات</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
+              size="lg"
               onClick={handleLogout}
-              className="text-destructive hover:text-destructive"
+              className="h-11 px-3 text-base text-destructive hover:text-destructive hover:bg-destructive/10"
             >
-              <LogOut />
+              <LogOut className="h-5 w-5 shrink-0" />
               <span>تسجيل الخروج</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <div className="px-2 py-1">
-              <LanguageSwitcherSimple />
-            </div>
-          </SidebarMenuItem>
         </SidebarMenu>
+        <div className="px-3 pt-2">
+          <LanguageSwitcherSimple />
+        </div>
       </SidebarFooter>
-    </>
+    </div>
   );
 }
