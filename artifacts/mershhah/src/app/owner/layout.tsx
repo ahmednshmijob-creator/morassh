@@ -43,21 +43,19 @@ export default function OwnerLayout({
   return (
       <div dir={dir}>
         <SessionTimeout />
-        <SidebarProvider>
-          <Sidebar side={isRTL ? "right" : "left"}>
+        <SidebarProvider defaultOpen={true}>
+          <Sidebar side={isRTL ? "right" : "left"} collapsible="icon">
             <OwnerSidebar />
           </Sidebar>
-          <div className="min-h-screen w-full bg-muted/40">
-              <SidebarInset>
-                  <Header />
-                  <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:grid-cols-1">
-                      <AccountStatusChecker>
-                        {children}
-                      </AccountStatusChecker>
-                  </main>
-                  <DashboardAssistant />
-              </SidebarInset>
-          </div>
+          <SidebarInset className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1 p-4 sm:p-6">
+              <AccountStatusChecker>
+                {children}
+              </AccountStatusChecker>
+            </main>
+            <DashboardAssistant />
+          </SidebarInset>
         </SidebarProvider>
       </div>
   );
