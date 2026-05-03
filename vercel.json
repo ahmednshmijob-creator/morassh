@@ -1,1 +1,11 @@
-{ "installCommand": "npm install -g pnpm@9.15.4 && pnpm install --frozen-lockfile", "buildCommand": "pnpm --filter @workspace/mershhah run build", "outputDirectory": "artifacts/mershhah/dist", "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+{
+  "installCommand": "npm install -g pnpm@10.26.1 && pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm --filter @workspace/mershhah run build",
+  "outputDirectory": "artifacts/mershhah/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
