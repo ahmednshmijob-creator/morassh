@@ -43,7 +43,7 @@ export default function OwnerLayout({
   return (
       <div dir={dir}>
         <SessionTimeout />
-        <SidebarProvider defaultOpen={true}>
+        <SidebarProvider defaultOpen={true} className={isRTL ? "flex-row-reverse" : ""}>
           <Sidebar side={isRTL ? "right" : "left"} collapsible="icon">
             <OwnerSidebar />
           </Sidebar>
