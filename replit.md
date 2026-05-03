@@ -9,55 +9,76 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ### مرشح | Mershhah (`artifacts/mershhah`)
 - **Kind**: web (Vite + React)
 - **Preview path**: `/`
-- **Stack**: React 18, Vite 7, Tailwind CSS v4, Wouter (routing), Firebase (auth + Firestore + Storage), TanStack Query
+- **Stack**: React 18, Vite 7, Tailwind CSS v4, Wouter (routing), Supabase (auth + DB + Storage), TanStack Query, shadcn/ui
 - **Description**: SaaS restaurant management platform for Saudi restaurants. Features: digital menu, AI chat assistant, owner dashboard, admin panel, public pages.
-- **Migrated from**: Next.js 15 App Router
+- **Migrated from**: Next.js 15 App Router (Firebase → Supabase)
+- **Deployed**: Vercel via GitHub repo `ahmednshmijob-creator/morassh`
 - **Key files**:
   - `src/App.tsx` — main router (Wouter Switch/Route tree)
   - `src/lib/navigation.ts` — Next.js navigation compatibility shim (useRouter, usePathname, useSearchParams, notFound)
-  - `src/lib/firebase.ts` — Firebase client config (hardcoded fallback values)
-  - `src/lib/firebase-admin.ts` — stubbed (returns null, admin SDK is server-only)
-  - `src/ai/genkit.ts` — stubbed (AI flows now call API server via fetch)
-  - `src/ai/flows/` — all AI flows stubbed as browser-safe fetch wrappers to `/api/ai/*`
-  - `src/index.css` — CSS theme with correct HSL values from original globals.css
-  - `src/app/` — all Next.js app router pages (ported to work as React components)
+  - `src/lib/supabase.ts` — Supabase client config (reads VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY)
+  - `src/lib/public-pages.ts` — syncs restaurant data to `public_pages` table for public menu views
+  - `src/hooks/useUser.ts` — auth hook with 8s timeout + 3-retry profile fetch
+  - `src/ai/flows/` — AI flows calling `/api/ai/*` endpoints
+  - `src/index.css` — CSS theme, RTL direction set at `:root`
+  - `src/app/` — all pages as React components
+  - `index.html` — `<html lang="ar" dir="rtl">`
+
+### Admin Layout (`src/app/admin/layout.tsx`)
+- Sidebar: `collapsible="none"`, `--sidebar-width: 17rem`, `side="right"` (RTL)
+- SidebarProvider: `flex-row-reverse` for RTL
+- SidebarInset + main: `min-w-0 overflow-hidden` to prevent content overflow
+
+### Owner Layout (`src/app/owner/layout.tsx`)
+- Same sidebar pattern as admin layout
 
 ### API Server (`artifacts/api-server`)
 - **Kind**: api (Express)
-- **Status**: Not yet started (needs AI flow endpoints if needed)
+- **Port**: 8080
+- **Routes**: `/api/ai/*` — AI flow endpoints (generate-menu-image, analyze-reviews, etc.)
+
+## Supabase Setup
+
+- **URL**: `https://rkozspoiragvpifqtwoa.supabase.co`
+- **Keys**: Set as `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in both Replit env vars AND Vercel env vars
+- **Tables**: profiles, restaurants, subscriptions, menu_items, menu_item_interactions, offers, branches, reviews, chats, chat_messages, activity, tools, activated_tools, plans, hub_visits, public_pages, support_tickets, announcements, team_members
+
+## Vercel Deployment
+
+- **Repo**: `ahmednshmijob-creator/morassh` (GitHub)
+- **Build command**: `pnpm --filter @workspace/mershhah run build`
+- **Output directory**: `artifacts/mershhah/dist/public`
+- **Install command**: `npm install -g pnpm@10.26.1 && pnpm install --frozen-lockfile`
+- **⚠️ GitHub pushes**: Use Node.js API scripts at `/tmp/push_*.mjs` — git pack is corrupted in local repo
 
 ## Stack
 
 - **Monorepo tool**: pnpm workspaces
-- **Node.js version**: 24
-- **Package manager**: pnpm
+- **Node.js version**: 22
+- **Package manager**: pnpm 10.26.1
 - **TypeScript version**: 5.9
 - **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
+- **Auth + DB**: Supabase (was Firebase)
+- **Build**: esbuild (api-server), Vite (web app)
 
 ## Key Commands
 
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `pnpm --filter @workspace/api-server run dev` — run API server locally
 - `pnpm --filter @workspace/mershhah run dev` — run Mershhah web app locally
+- `pnpm --filter @workspace/api-server run dev` — run API server locally
+- `pnpm --filter @workspace/mershhah run build` — build for production
 
-## Migration Notes (Next.js → Vite + React)
+## App Architecture
 
-- All `next/link` → `import { Link } from 'wouter'`
-- All `next/image` → `<img>` tags
-- All `next/navigation` → `@/lib/navigation` shim
-- All `next/router` → `@/lib/navigation` shim
-- All genkit AI flows → browser-safe stubs calling `/api/ai/*` endpoints
-- `firebase-admin` → stubbed (null exports, client can't use server SDK)
-- `'use server'` directives → removed (server actions don't exist in Vite)
-- `export const metadata` → removed (Next.js App Router feature)
-- `process.env.NEXT_PUBLIC_*` → `import.meta.env.VITE_*`
-- Firebase config has hardcoded fallback values in `src/lib/firebase.ts`
+- **Language**: Arabic-only (RTL always). `LanguageContext` always returns `locale: 'ar'`, `dir: 'rtl'`, `isRTL: true`
+- **Super Admin email**: `ahmedsupsa@gmail.com` (hardcoded in LoginForm, RegisterForm, AdminSidebar)
+- **Auth flow**: Supabase Auth → profile lookup in `profiles` table → redirect to `/admin/*` or `/owner/*`
+- **Public pages**: Restaurant data cached in `public_pages` table (keyed by username), synced via `syncPublicPage()` on changes
+- **Sidebar**: Fixed-width (17rem), non-collapsible, RTL-aware (appears on right side for Arabic)
 
-See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.
+## Migration Notes (Firebase → Supabase)
+
+- All `firebase/firestore` → `supabase.from(table).*`
+- All `firebase/auth` → `supabase.auth.*`
+- All `firebase/storage` → `supabase.storage.from(bucket).*`
+- `getSession()` timeout: 8 seconds with `.catch()` fallback
+- Profile fetch: 3 retries with 800ms delay
