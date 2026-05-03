@@ -86,7 +86,10 @@ export default function AdminDashboardPage() {
     return (
       <div className="p-4 lg:p-6 space-y-8 text-right" dir="rtl">
         <div>
-          <h1 className="text-2xl font-bold">لوحة المعلومات (مدير)</h1>
+          <div className="flex items-center gap-3 justify-end">
+            <span className="inline-flex items-center rounded-full bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 border border-purple-200">مدير النظام</span>
+            <h1 className="text-2xl font-bold">لوحة التحكم</h1>
+          </div>
           <p className="text-muted-foreground">جاري جلب البيانات الفعلية من النظام...</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -105,7 +108,10 @@ export default function AdminDashboardPage() {
   return (
     <div className="p-4 lg:p-6 space-y-8 text-right" dir="rtl">
       <div>
-        <h1 className="text-2xl font-bold">لوحة المعلومات (مدير)</h1>
+        <div className="flex items-center gap-3 justify-end">
+          <span className="inline-flex items-center rounded-full bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 border border-purple-200">مدير النظام</span>
+          <h1 className="text-2xl font-bold">لوحة التحكم</h1>
+        </div>
         <p className="text-muted-foreground">نظرة عامة دقيقة على أداء ونمو المنصة.</p>
       </div>
 
