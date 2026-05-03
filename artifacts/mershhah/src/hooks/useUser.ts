@@ -130,13 +130,23 @@ export function useUser() {
   };
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setUser(null);
+      setIsLoading(false);
+    }, 8000);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timeout);
       if (session?.user) {
         loadUserData(session.user.id);
       } else {
         setUser(null);
         setIsLoading(false);
       }
+    }).catch(() => {
+      clearTimeout(timeout);
+      setUser(null);
+      setIsLoading(false);
     });
 
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
