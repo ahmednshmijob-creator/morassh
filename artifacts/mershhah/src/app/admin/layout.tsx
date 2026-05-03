@@ -42,13 +42,17 @@ export default function AdminLayout({
   return (
       <div dir={dir}>
         <SessionTimeout />
-        <SidebarProvider defaultOpen={true} className={isRTL ? "flex-row-reverse" : ""}>
-          <Sidebar side={isRTL ? "right" : "left"} collapsible="icon">
+        <SidebarProvider
+          defaultOpen={true}
+          className={isRTL ? "flex-row-reverse" : ""}
+          style={{ "--sidebar-width": "17rem" } as React.CSSProperties}
+        >
+          <Sidebar side={isRTL ? "right" : "left"} collapsible="none">
             <AdminSidebar />
           </Sidebar>
-          <SidebarInset className="min-h-screen flex flex-col">
+          <SidebarInset className="flex min-h-screen flex-col min-w-0 overflow-hidden">
             <Header />
-            <main className="flex-1 p-4 sm:p-6">
+            <main className="flex-1 w-full min-w-0 p-4 sm:p-6">
               <AdminAccountStatusChecker>
                 {children}
               </AdminAccountStatusChecker>
