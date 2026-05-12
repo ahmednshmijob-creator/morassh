@@ -17,12 +17,14 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from '@/lib/navigation';
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { Badge } from '@/components/ui/badge';
 
 const ADMIN_EMAIL = 'ahmedsupsa@gmail.com';
 const DEMO_EMAIL = 'demo@mershhah.com';
 const DEMO_PASSWORD = 'demo123';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 const allAdminPermissions = [
   'dashboard', 'management', 'financials', 'store-management',
@@ -61,6 +63,21 @@ export function RegisterForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
+  const [pendingPlanName, setPendingPlanName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const planId = params.get('plan');
+    if (planId) {
+      setPendingPlanId(planId);
+      // fetch plan name for display
+      supabase.from('plans').select('name, price').eq('id', planId).single()
+        .then(({ data }) => {
+          if (data) setPendingPlanName(`${data.name} — ${data.price} ر.س`);
+        });
+    }
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -99,7 +116,6 @@ export function RegisterForm() {
       if (authError) throw new Error(authError.message);
       if (!authData.user) throw new Error('لم يتم إنشاء الحساب. حاول مرة أخرى.');
 
-      // If email confirmation is required, session will be null
       if (!authData.session) {
         toast({
           title: 'تحقق من بريدك الإلكتروني',
@@ -123,7 +139,6 @@ export function RegisterForm() {
         uniqueUsername = isDemoUser ? 'democafe' : `${emailPrefix}-${randomSuffix}`;
       }
 
-      // Insert profile FIRST (restaurants.owner_id FK requires profile to exist)
       const profileData: any = {
         id: userId,
         full_name: values.fullName,
@@ -221,6 +236,30 @@ export function RegisterForm() {
         );
       }
 
+      // If a paid plan was selected before registration, redirect to checkout
+      if (!isAdmin && pendingPlanId) {
+        toast({ title: 'تم التسجيل! 🎉', description: 'جاري تحويلك لإتمام الدفع...' });
+        try {
+          const checkoutRes = await fetch(`${API_BASE}/payment/create-checkout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              planId: pendingPlanId,
+              profileId: userId,
+              successUrl: `${window.location.origin}/success`,
+              failureUrl: `${window.location.origin}/failure`,
+            }),
+          });
+          const checkoutData = await checkoutRes.json() as { url?: string };
+          if (checkoutData.url) {
+            window.location.href = checkoutData.url;
+            return;
+          }
+        } catch {
+          // fallback to dashboard
+        }
+      }
+
       toast({
         title: 'تم التسجيل بنجاح!',
         description: isAdmin ? 'أهلاً بك أيها المدير.' : 'أهلاً بك! تم تفعيل الباقة المجانية لحسابك.',
@@ -231,7 +270,6 @@ export function RegisterForm() {
       } else {
         router.push('/owner/dashboard');
       }
-      router.refresh();
     } catch (error: any) {
       const msg: string = error?.message || '';
       let description = msg || 'حدث خطأ غير متوقع.';
@@ -248,6 +286,15 @@ export function RegisterForm() {
 
   return (
     <Form {...form}>
+      {pendingPlanName && (
+        <div className="mb-4 p-3 rounded-lg bg-primary/5 border border-primary/20 flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">الباقة المختارة</p>
+            <p className="text-sm font-bold text-primary">{pendingPlanName}</p>
+          </div>
+          <Badge className="bg-primary/10 text-primary border-primary/20">بعد التسجيل ستنتقل للدفع</Badge>
+        </div>
+      )}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
         <FormField
           control={form.control}
@@ -336,7 +383,11 @@ export function RegisterForm() {
           )}
         />
         <Button type="submit" className="w-full !mt-6" disabled={isLoading}>
-          {isLoading ? 'لحظات...' : 'إنشاء حساب'}
+          {isLoading ? (
+            <><Loader2 className="animate-spin h-4 w-4 ml-2" />{pendingPlanId ? 'جاري التسجيل والدفع...' : 'لحظات...'}</>
+          ) : (
+            pendingPlanId ? 'أنشئ حسابك وأكمل الدفع' : 'إنشاء حساب'
+          )}
         </Button>
         <div className="text-center text-sm text-muted-foreground pt-4">
           عندك حساب؟{' '}
