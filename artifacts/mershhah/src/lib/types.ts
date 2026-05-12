@@ -22,7 +22,7 @@ export type Restaurant = {
   name: string;
   name_en?: string; // English name
   username: string;
-  username_last_updated_at?: any; // Can be Firestore Timestamp
+  username_last_updated_at?: any;
   description: string | null;
   description_en?: string | null; // English description
   logo: string | null;
@@ -155,7 +155,7 @@ export type ChatSession = {
     ownerName: string;
     ownerLogo?: string | null;
     lastMessage?: string;
-    lastMessageTimestamp?: any; // Firestore Timestamp
+    lastMessageTimestamp?: any;
     adminHasUnread?: boolean;
     ownerHasUnread?: boolean;
 };
