@@ -1,6 +1,6 @@
 /**
- * ميزات افتراضية للباقات (تُستخدم عند عدم وجود حقل features في وثيقة الباقة).
- * يمكن للمدير لاحقاً إضافة حقل features في Firestore لكل باقة.
+ * ميزات افتراضية للباقات (تُستخدم عند عدم وجود حقل features في سجل الباقة).
+ * يمكن للمدير إضافة حقل features لكل باقة في Supabase.
  */
 export const DEFAULT_PLAN_FEATURES: Record<string, Record<string, boolean>> = {
   free: {
