@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { LanguageProvider } from "@/components/shared/LanguageContext";
 import { HydrationGate } from "@/components/shared/HydrationGate";
+import { UserProvider } from "@/contexts/UserContext";
 
 import HomePage from "@/app/page";
 import LoginPage from "@/app/login/page";
@@ -22,12 +23,9 @@ import OwnerCustomizePage from "@/app/owner/customize/page";
 import OwnerBranchesPage from "@/app/owner/branches/page";
 import OwnerReviewsPage from "@/app/owner/reviews/page";
 import OwnerSettingsPage from "@/app/owner/settings/page";
-import OwnerStorePage from "@/app/owner/store/page";
 import OwnerPricingPage from "@/app/owner/pricing/page";
 import OwnerTicketsPage from "@/app/owner/tickets/page";
 import OwnerTicketDetailPage from "@/app/owner/tickets/[ticketId]/page";
-import OwnerToolsPage from "@/app/owner/tools/page";
-import OwnerToolDetailPage from "@/app/owner/tools/[toolId]/page";
 import DailyPulsePage from "@/app/owner/tools/daily-pulse-dashboard/page";
 import MarketingCalendarPage from "@/app/owner/tools/marketing-calendar/page";
 import ReplyTemplatesPage from "@/app/owner/tools/reply-templates/page";
@@ -40,8 +38,6 @@ import AdminLayout from "@/app/admin/layout";
 import AdminDashboardPage from "@/app/admin/dashboard/page";
 import AdminManagementPage from "@/app/admin/management/page";
 import AdminPlansPage from "@/app/admin/plans/page";
-import AdminStorePage from "@/app/admin/store/page";
-import AdminStoreManagementPage from "@/app/admin/store-management/page";
 import AdminSupportPage from "@/app/admin/support/page";
 import AdminSupportChatPage from "@/app/admin/support/[chatId]/page";
 import AdminSettingsPage from "@/app/admin/settings/page";
@@ -50,6 +46,12 @@ import AdminSalesPage from "@/app/admin/sales/page";
 import AdminApplicationsPage from "@/app/admin/applications/page";
 import AdminAnnouncementsPage from "@/app/admin/announcements/page";
 import AdminWorkflowPage from "@/app/admin/workflow/page";
+import AdminFinancePage from "@/app/admin/finance/page";
+
+import ReferLookupPage from "@/app/refer/lookup/page";
+import TicketLookupPage from "@/app/ticket/lookup/page";
+import OwnerIndexPage from "@/app/owner/page";
+import OwnerUpgradePage from "@/app/owner/upgrade/page";
 
 import MenuPage from "@/app/menu/[username]/page";
 import HubPage from "@/app/hub/[username]/page";
@@ -85,7 +87,6 @@ function OwnerRoutes({ params }: { params?: any }) {
         <Route path="/owner/branches" component={OwnerBranchesPage} />
         <Route path="/owner/reviews" component={OwnerReviewsPage} />
         <Route path="/owner/settings" component={OwnerSettingsPage} />
-        <Route path="/owner/store" component={OwnerStorePage} />
         <Route path="/owner/pricing" component={OwnerPricingPage} />
         <Route path="/owner/tickets/:ticketId" component={OwnerTicketDetailPage} />
         <Route path="/owner/tickets" component={OwnerTicketsPage} />
@@ -94,10 +95,9 @@ function OwnerRoutes({ params }: { params?: any }) {
         <Route path="/owner/tools/reply-templates" component={ReplyTemplatesPage} />
         <Route path="/owner/tools/summarize-feedback" component={SummarizeFeedbackPage} />
         <Route path="/owner/tools/weekly-content-writer" component={WeeklyContentWriterPage} />
-        <Route path="/owner/tools/:toolId" component={OwnerToolDetailPage} />
-        <Route path="/owner/tools" component={OwnerToolsPage} />
         <Route path="/owner/support" component={OwnerSupportPage} />
         <Route path="/owner/studio" component={OwnerStudioPage} />
+        <Route path="/owner/upgrade" component={OwnerUpgradePage} />
         <Route component={NotFoundPage} />
       </Switch>
     </OwnerLayout>
@@ -111,8 +111,6 @@ function AdminRoutes({ params }: { params?: any }) {
         <Route path="/admin/dashboard" component={AdminDashboardPage} />
         <Route path="/admin/management" component={AdminManagementPage} />
         <Route path="/admin/plans" component={AdminPlansPage} />
-        <Route path="/admin/store" component={AdminStorePage} />
-        <Route path="/admin/store-management" component={AdminStoreManagementPage} />
         <Route path="/admin/support/:chatId" component={AdminSupportChatPage} />
         <Route path="/admin/support" component={AdminSupportPage} />
         <Route path="/admin/settings" component={AdminSettingsPage} />
@@ -121,6 +119,7 @@ function AdminRoutes({ params }: { params?: any }) {
         <Route path="/admin/applications" component={AdminApplicationsPage} />
         <Route path="/admin/announcements" component={AdminAnnouncementsPage} />
         <Route path="/admin/workflow" component={AdminWorkflowPage} />
+        <Route path="/admin/finance" component={AdminFinancePage} />
         <Route component={NotFoundPage} />
       </Switch>
     </AdminLayout>
@@ -143,9 +142,12 @@ function Router() {
       <Route path="/bio" component={BioPage} />
       <Route path="/success" component={SuccessPage} />
       <Route path="/failure" component={FailurePage} />
+      <Route path="/refer/lookup" component={ReferLookupPage} />
       <Route path="/refer" component={ReferPage} />
       <Route path="/status" component={StatusPage} />
+      <Route path="/ticket/lookup" component={TicketLookupPage} />
       <Route path="/ticket" component={TicketPage} />
+      <Route path="/owner" component={OwnerIndexPage} />
       <Route path="/support/:username" component={SupportPublicPage} />
       <Route path="/oauth/consent" component={OAuthConsentPage} />
       <Route path="/blog" component={BlogListPage} />
@@ -169,12 +171,14 @@ function App() {
       <TooltipProvider>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <LanguageProvider>
-            <HydrationGate>
-              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-                <Router />
-              </WouterRouter>
-              <Toaster />
-            </HydrationGate>
+            <UserProvider>
+              <HydrationGate>
+                <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+                  <Router />
+                </WouterRouter>
+                <Toaster />
+              </HydrationGate>
+            </UserProvider>
           </LanguageProvider>
         </ThemeProvider>
       </TooltipProvider>
