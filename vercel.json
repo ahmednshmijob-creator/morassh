@@ -1,4 +1,5 @@
 {
   "installCommand": "npm install -g pnpm@10.26.1 && pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm --filter @workspace/mershhah run build && pnpm --filter @workspace/api-server run build"
+  "buildCommand": "pnpm --filter @workspace/mershhah run build && pnpm --filter @workspace/api-server run build",
+  "outputDirectory": "artifacts/mershhah/dist/public"
 }
