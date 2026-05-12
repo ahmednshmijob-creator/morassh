@@ -45,13 +45,13 @@ export default function OwnerLayout({
         <SessionTimeout />
         <SidebarProvider
           defaultOpen={true}
-          className={isRTL ? "flex-row-reverse" : ""}
+          dir="rtl"
           style={{ "--sidebar-width": "17rem" } as React.CSSProperties}
         >
-          <Sidebar side={isRTL ? "right" : "left"} collapsible="none">
+          <Sidebar side="right" collapsible="none">
             <OwnerSidebar />
           </Sidebar>
-          <SidebarInset className="flex min-h-screen flex-col min-w-0 overflow-hidden">
+          <SidebarInset className="flex min-h-screen flex-col min-w-0 overflow-y-auto">
             <Header />
             <main className="flex-1 w-full min-w-0 p-4 sm:p-6">
               <AccountStatusChecker>
