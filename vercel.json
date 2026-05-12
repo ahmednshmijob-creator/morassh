@@ -1,3 +1,4 @@
 {
-  "installCommand": "npm install -g pnpm@10.26.1 && pnpm install --no-frozen-lockfile"
+  "installCommand": "npm install -g pnpm@10.26.1 && pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm -r --filter \"./artifacts/**\" --if-present run build"
 }
