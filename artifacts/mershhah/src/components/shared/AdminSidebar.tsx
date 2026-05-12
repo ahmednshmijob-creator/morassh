@@ -15,13 +15,13 @@ import {
   Settings,
   MessageSquare,
   Building,
-  Store,
   Users,
   Activity,
   Megaphone,
   AppWindow,
   Package,
   TrendingUp,
+  DollarSign,
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { Separator } from '../ui/separator';
@@ -44,7 +44,7 @@ export function AdminSidebar() {
     { href: '/admin/dashboard', label: 'لوحة التحكم', icon: LayoutDashboard, permissionId: 'dashboard' },
     { href: '/admin/management', label: 'المشتركين', icon: Building, permissionId: 'management' },
     { href: '/admin/plans', label: 'الباقات', icon: Package, permissionId: 'financials' },
-    { href: '/admin/store-management', label: 'إدارة المتجر', icon: Store, permissionId: 'store-management' },
+    { href: '/admin/finance', label: 'المالية', icon: DollarSign, permissionId: 'financials' },
     { href: '/admin/applications', label: 'التطبيقات', icon: AppWindow, permissionId: 'applications' },
     { href: '/admin/announcements', label: 'الإعلانات', icon: Megaphone, permissionId: 'announcements' },
     { href: '/admin/support', label: 'الدعم المباشر', icon: MessageSquare, permissionId: 'support' },
@@ -139,9 +139,6 @@ export function AdminSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="px-3 pt-2">
-          <LanguageSwitcherSimple />
-        </div>
       </SidebarFooter>
     </div>
   );
