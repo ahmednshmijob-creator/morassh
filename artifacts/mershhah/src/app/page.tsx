@@ -8,7 +8,6 @@ import {
   BarChart3, 
   Bot, 
   Palette, 
-  Store, 
   Globe, 
   TrendingUp, 
   QrCode, 
@@ -47,11 +46,6 @@ export default function HomePage() {
         icon: Palette,
         title: "استوديو الهوية",
         description: "صمم واجهاتك الرقمية بنفسك لتتناسب مع علامتك التجارية."
-    },
-    {
-        icon: Store,
-        title: "متجر أدوات إضافية",
-        description: "فعّل أدوات تساعدك على النمو، مثل تقويم التسويق وكاتب المحتوى."
     },
     {
         icon: BarChart3,
